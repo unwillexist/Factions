@@ -11,60 +11,69 @@ import com.massivecraft.factions.entity.MPlayer;
 import com.massivecraft.factions.event.EventFactionsMembershipChange;
 import com.massivecraft.factions.event.EventFactionsMembershipChange.MembershipChangeReason;
 import com.massivecraft.massivecore.MassiveException;
-import com.massivecraft.massivecore.util.IdUtil;
 import org.bukkit.ChatColor;
+import com.massivecraft.massivecore.util.IdUtil;
+import com.massivecraft.massivecore.command.requirement.RequirementHasPerm;
+import com.massivecraft.factions.Perm;
+
 
 public class CmdFactionsKick extends FactionsCommand
 {
 	// -------------------------------------------- //
 	// CONSTRUCT
 	// -------------------------------------------- //
-	
+
 	public CmdFactionsKick()
 	{
+
+		this.setSetupEnabled(false);
+		this.setAliases("at");
+
 		// Parameters
-		this.addParameter(TypeMPlayer.get(), "player");
+		this.addParameter(TypeMPlayer.get(), "oyuncu");
+
+		this.addRequirements(RequirementHasPerm.get(Perm.KICK));
 	}
 
 	// -------------------------------------------- //
 	// OVERRIDE
 	// -------------------------------------------- //
-	
+
 	@Override
 	public void perform() throws MassiveException
 	{
 		// Arg
 		MPlayer mplayer = this.readArg();
-		
+
 		// Validate
 		if (msender == mplayer)
 		{
-			msg("<b>You can't kick yourself.");
-			message(mson(mson("You might want to: ").color(ChatColor.YELLOW), CmdFactions.get().cmdFactionsLeave.getTemplate(false)));
+			msg("<b>Kendini atamazsın.");
+			message(mson(mson("Bunu yapmak istemiş olabilirsin: ").color(ChatColor.YELLOW), CmdFactions.get().cmdFactionsLeave.getTemplate(false)));
 			return;
 		}
-		
+
 		if (mplayer.getRole() == Rel.LEADER && !msender.isOverriding())
 		{
-			throw new MassiveException().addMsg("<b>The leader cannot be kicked.");
+			throw new MassiveException().addMsg("<b>Lider atılamaz.");
 		}
-		
+
 		if (mplayer.getRole().isMoreThan(msender.getRole()) && ! msender.isOverriding())
 		{
-			throw new MassiveException().addMsg("<b>You can't kick people of higher rank than yourself.");
+			throw new MassiveException().addMsg("<b>Senden daha yüksek rütbeye sahip kişileri atamazsın.");
 		}
-		
+
 		if (mplayer.getRole() == msender.getRole() && ! msender.isOverriding())
 		{
-			throw new MassiveException().addMsg("<b>You can't kick people of the same rank as yourself.");
+			throw new MassiveException().addMsg("<b>Seninle aynı rütbedeki kişileri atamazsın.");
 		}
 
 		if ( ! MConf.get().canLeaveWithNegativePower && mplayer.getPower() < 0 && ! msender.isOverriding())
 		{
-			msg("<b>You can't kick that person until their power is positive.");
+			msg("<b>Güçleri pozitif olana kadar bu kişileri atamazsın.");
 			return;
 		}
-		
+
 		// MPerm
 		Faction mplayerFaction = mplayer.getFaction();
 		if ( ! MPerm.getPermKick().has(msender, mplayerFaction, true)) return;
@@ -75,16 +84,16 @@ public class CmdFactionsKick extends FactionsCommand
 		if (event.isCancelled()) return;
 
 		// Inform
-		mplayerFaction.msg("%s<i> kicked %s<i> from the faction! :O", msender.describeTo(mplayerFaction, true), mplayer.describeTo(mplayerFaction, true));
-		mplayer.msg("%s<i> kicked you from %s<i>! :O", msender.describeTo(mplayer, true), mplayerFaction.describeTo(mplayer));
+		mplayerFaction.msg("%s<i> adlı oyuncu %s<i> adlı oyuncu klandan attı! :O", msender.describeTo(mplayerFaction, true), mplayer.describeTo(mplayerFaction, true));
+		mplayer.msg("%s<i> adlı oyuncu seni %s<i> adlı klandan attı! :O", msender.describeTo(mplayer, true), mplayerFaction.describeTo(mplayer));
 		if (mplayerFaction != msenderFaction)
 		{
-			msender.msg("<i>You kicked %s<i> from the faction %s<i>!", mplayer.describeTo(msender), mplayerFaction.describeTo(msender));
+			msender.msg("<i>%s<i> adlı oyuncuyu %s<i> adlı klandan attın!", mplayer.describeTo(msender), mplayerFaction.describeTo(msender));
 		}
 
 		if (MConf.get().logFactionKick)
 		{
-			Factions.get().log(msender.getDisplayName(IdUtil.getConsole()) + " kicked " + mplayer.getName() + " from the faction " + mplayerFaction.getName());
+			Factions.get().log(msender.getDisplayName(IdUtil.getConsole()) + " adlı oyuncu " + mplayer.getName() + " adlı oyuncuyu " + mplayerFaction.getName() + " klanından attı. ");
 		}
 
 		// Apply
@@ -95,5 +104,5 @@ public class CmdFactionsKick extends FactionsCommand
 		mplayerFaction.uninvite(mplayer);
 		mplayer.resetFactionData();
 	}
-	
+
 }

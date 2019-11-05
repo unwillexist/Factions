@@ -10,6 +10,8 @@ import com.massivecraft.massivecore.mixin.MixinMessage;
 import com.massivecraft.massivecore.util.Txt;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import com.massivecraft.massivecore.command.requirement.RequirementHasPerm;
+import com.massivecraft.factions.Perm;
 
 import java.util.TreeSet;
 
@@ -18,27 +20,30 @@ public class CmdFactionsFaction extends FactionsCommand
 	// -------------------------------------------- //
 	// CONSTRUCT
 	// -------------------------------------------- //
-	
+
 	public CmdFactionsFaction()
 	{
 		// Aliases
-		this.addAliases("f", "show", "who");
+		this.setSetupEnabled(false);
+		this.setAliases("klanlar", "göster", "kim");
 
 		// Parameters
-		this.addParameter(TypeFaction.get(), "faction", "you");
+		this.addParameter(TypeFaction.get(), "klan", "sen");
+
+		this.addRequirements(RequirementHasPerm.get(Perm.FACTION));
 	}
 
 	// -------------------------------------------- //
 	// OVERRIDE
 	// -------------------------------------------- //
-	
+
 	@Override
 	public void perform() throws MassiveException
 	{
 		// Args
 		final Faction faction = this.readArg(msenderFaction);
 		final CommandSender sender = this.sender;
-		
+
 		Bukkit.getScheduler().runTaskAsynchronously(Factions.get(), new Runnable()
 		{
 			@Override
@@ -48,10 +53,10 @@ public class CmdFactionsFaction extends FactionsCommand
 				EventFactionsFactionShowAsync event = new EventFactionsFactionShowAsync(sender, faction);
 				event.run();
 				if (event.isCancelled()) return;
-				
+
 				// Title
-				MixinMessage.get().messageOne(sender, Txt.titleize("Faction " + faction.getName(msender)));
-				
+				MixinMessage.get().messageOne(sender, Txt.titleize("Klan " + faction.getName(msender)));
+
 				// Lines
 				TreeSet<PriorityLines> priorityLiness = new TreeSet<>(event.getIdPriorityLiness().values());
 				for (PriorityLines priorityLines : priorityLiness)
@@ -60,7 +65,7 @@ public class CmdFactionsFaction extends FactionsCommand
 				}
 			}
 		});
-		
+
 	}
-	
+
 }

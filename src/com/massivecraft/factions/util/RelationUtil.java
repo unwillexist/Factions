@@ -14,29 +14,29 @@ public class RelationUtil
 	// -------------------------------------------- //
 	// CONSTANTS
 	// -------------------------------------------- //
-	
-	private static final String UNKNOWN_RELATION_OTHER = "A server admin";
-	private static final String UNDEFINED_FACTION_OTHER = "ERROR";
-	private static final String OWN_FACTION = "your faction";
-	private static final String SELF = "you";
-	
+
+	private static final String UNKNOWN_RELATION_OTHER = "Sunucu yöneticisi";
+	private static final String UNDEFINED_FACTION_OTHER = "HATA";
+	private static final String OWN_FACTION = "senin klanın";
+	private static final String SELF = "sen";
+
 	// -------------------------------------------- //
 	// DESCRIBE
 	// -------------------------------------------- //
-	
+
 	public static String describeThatToMe(RelationParticipator that, RelationParticipator me, boolean ucfirst)
 	{
 		String ret = "";
 
 		if (that == null) return UNKNOWN_RELATION_OTHER;
-		
+
 		Faction thatFaction = getFaction(that);
 		if (thatFaction == null) return UNDEFINED_FACTION_OTHER; // ERROR
 
 		Faction myFaction = getFaction(me);
-		
+
 		boolean isSameFaction = thatFaction == myFaction;
-		
+
 		if (that instanceof Faction)
 		{
 			String thatFactionName = thatFaction.getName();
@@ -79,7 +79,7 @@ public class RelationUtil
 	{
 		return describeThatToMe(that, me, false);
 	}
-	
+
 	// -------------------------------------------- //
 	// RELATION
 	// -------------------------------------------- //
@@ -96,22 +96,22 @@ public class RelationUtil
 
 		Faction thatFaction = getFaction(that);
 		if (thatFaction == null) return Rel.NEUTRAL; // ERROR
-		
+
 		if (myFaction.equals(thatFaction))
 		{
 			if (that instanceof MPlayer) return ((MPlayer) that).getRole();
 			return Rel.MEMBER;
 		}
-		
+
 		MFlag flagPeaceful = MFlag.getFlagPeaceful();
 		if (!ignorePeaceful && (thatFaction.getFlag(flagPeaceful) || myFaction.getFlag(flagPeaceful))) return Rel.TRUCE;
-		
+
 		// The faction with the lowest wish "wins"
 		Rel theirWish = thatFaction.getRelationWish(myFaction);
 		Rel myWish = myFaction.getRelationWish(thatFaction);
 		return theirWish.isLessThan(myWish) ? theirWish : myWish;
 	}
-	
+
 	// -------------------------------------------- //
 	// FACTION
 	// -------------------------------------------- //
@@ -125,7 +125,7 @@ public class RelationUtil
 		// ERROR
 		return null;
 	}
-	
+
 	// -------------------------------------------- //
 	// COLOR
 	// -------------------------------------------- //
@@ -136,10 +136,10 @@ public class RelationUtil
 		if (thatFaction != null && thatFaction != getFaction(me))
 		{
 			if (thatFaction.getFlag(MFlag.getFlagFriendlyire())) return MConf.get().colorFriendlyFire;
-			
+
 			if (!thatFaction.getFlag(MFlag.getFlagPvp())) return MConf.get().colorNoPVP;
 		}
 		return getRelationOfThatToMe(that, me).getColor();
 	}
-	
+
 }

@@ -27,7 +27,7 @@ permissions:
   factions.description: {description: change faction description, default: false}
   factions.disband: {description: disband faction, default: false}
   factions.expansions: {description: list expansions, default: false}
-  factions.faction: {description: show faction information, default: false}
+  factions.faction: {description: klan bilgisi göster, default: false}
   factions.flag: {description: manage faction flags, default: false}
   factions.flag.list: {description: list flags, default: false}
   factions.flag.set: {description: set flags, default: false}
@@ -38,11 +38,11 @@ permissions:
   factions.invite.list.other: {description: list invited players of another factions, default: false}
   factions.invite.add: {description: invite player, default: false}
   factions.invite.remove: {description: revoke an invite, default: false}
-  factions.join: {description: join faction, default: false}
+  factions.join: {description: klana katıl, default: false}
   factions.join.others: {description: have another player join faction, default: false}
-  factions.kick: {description: kick player from faction, default: false}
+  factions.kick: {description: klandan bir üyeyi at, default: false}
   factions.leave: {description: leave your faction, default: false}
-  factions.list: {description: list all factions, default: false}
+  factions.list: {description: bütün klanları listele, default: false}
   factions.map: {description: show territory map, default: false}
   factions.money: {description: manage faction money, default: false}
   factions.money.balance: {description: show faction money, default: false}
@@ -58,7 +58,7 @@ permissions:
   factions.perm.list: {description: list perms, default: false}
   factions.perm.set: {description: set perms, default: false}
   factions.perm.show: {description: show perms, default: false}
-  factions.player: {description: show player information}
+  factions.player: {description: oyuncu bilgisi göster, default: false}
   factions.powerboost: {description: manage powerboost, default: false}
   factions.powerboost.faction: {description: show faction powerboost, default: false}
   factions.powerboost.player: {description: show player powerboost, default: false}

@@ -15,7 +15,7 @@ public class CmdFactionsSethome extends FactionsCommandHome
 	// -------------------------------------------- //
 	// CONSTRUCT
 	// -------------------------------------------- //
-	
+
 	public CmdFactionsSethome()
 	{
 		// Aliases
@@ -32,25 +32,25 @@ public class CmdFactionsSethome extends FactionsCommandHome
 	// -------------------------------------------- //
 	// OVERRIDE
 	// -------------------------------------------- //
-	
+
 	@Override
 	public void perform() throws MassiveException
 	{
 		// Args
 		Faction faction = this.readArg(msenderFaction);
-		
+
 		PS newHome = PS.valueOf(me.getLocation());
-		
+
 		// MPerm
 		if ( ! MPerm.getPermSethome().has(msender, faction, true)) return;
-		
+
 		// Verify
 		if (!msender.isOverriding() && !faction.isValidHome(newHome))
 		{
 			msender.msg("<b>Sorry, your faction home can only be set inside your own claimed territory.");
 			return;
 		}
-		
+
 		// Event
 		EventFactionsHomeChange event = new EventFactionsHomeChange(sender, faction, newHome);
 		event.run();
@@ -59,7 +59,7 @@ public class CmdFactionsSethome extends FactionsCommandHome
 
 		// Apply
 		faction.setHome(newHome);
-		
+
 		// Inform
 		faction.msg("%s<i> set the home for your faction. You can now use:", msender.describeTo(msenderFaction, true));
 		faction.sendMessage(CmdFactions.get().cmdFactionsHome.getTemplate());
@@ -68,5 +68,5 @@ public class CmdFactionsSethome extends FactionsCommandHome
 			msender.msg("<i>You have set the home for " + faction.getName(msender) + "<i>.");
 		}
 	}
-	
+
 }

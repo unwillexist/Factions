@@ -32,19 +32,19 @@ public class EngineShow extends Engine
 	// -------------------------------------------- //
 	// CONSTANTS
 	// -------------------------------------------- //
-	
-	public static final String BASENAME = "factions";
+
+	public static final String BASENAME = "klanlar";
 	public static final String BASENAME_ = BASENAME+"_";
-	
+
 	public static final String SHOW_ID_FACTION_ID = BASENAME_ + "id";
-	public static final String SHOW_ID_FACTION_DESCRIPTION = BASENAME_ + "description";
-	public static final String SHOW_ID_FACTION_AGE = BASENAME_ + "age";
-	public static final String SHOW_ID_FACTION_FLAGS = BASENAME_ + "flags";
-	public static final String SHOW_ID_FACTION_POWER = BASENAME_ + "power";
+	public static final String SHOW_ID_FACTION_DESCRIPTION = BASENAME_ + "açıklama";
+	public static final String SHOW_ID_FACTION_AGE = BASENAME_ + "geçmiş";
+	public static final String SHOW_ID_FACTION_FLAGS = BASENAME_ + "gönderler";
+	public static final String SHOW_ID_FACTION_POWER = BASENAME_ + "güç";
 	public static final String SHOW_ID_FACTION_LANDVALUES = BASENAME_ + "landvalue";
-	public static final String SHOW_ID_FACTION_BANK = BASENAME_ + "bank";
-	public static final String SHOW_ID_FACTION_FOLLOWERS = BASENAME_ + "followers";
-	
+	public static final String SHOW_ID_FACTION_BANK = BASENAME_ + "banka";
+	public static final String SHOW_ID_FACTION_FOLLOWERS = BASENAME_ + "yoldaşlar";
+
 	public static final int SHOW_PRIORITY_FACTION_ID = 1000;
 	public static final int SHOW_PRIORITY_FACTION_DESCRIPTION = 2000;
 	public static final int SHOW_PRIORITY_FACTION_AGE = 3000;
@@ -53,11 +53,11 @@ public class EngineShow extends Engine
 	public static final int SHOW_PRIORITY_FACTION_LANDVALUES = 6000;
 	public static final int SHOW_PRIORITY_FACTION_BANK = 7000;
 	public static final int SHOW_PRIORITY_FACTION_FOLLOWERS = 9000;
-	
+
 	// -------------------------------------------- //
 	// INSTANCE & CONSTRUCT
 	// -------------------------------------------- //
-	
+
 	private static EngineShow i = new EngineShow();
 	public static EngineShow get() { return i; }
 
@@ -83,7 +83,7 @@ public class EngineShow extends Engine
 		}
 
 		// DESCRIPTION
-		show(idPriorityLiness, SHOW_ID_FACTION_DESCRIPTION, SHOW_PRIORITY_FACTION_DESCRIPTION, "Description", faction.getDescriptionDesc());
+		show(idPriorityLiness, SHOW_ID_FACTION_DESCRIPTION, SHOW_PRIORITY_FACTION_DESCRIPTION, "Açıklama", faction.getDescriptionDesc());
 
 		// SECTION: NORMAL
 		if (normal)
@@ -92,7 +92,7 @@ public class EngineShow extends Engine
 			long ageMillis = faction.getCreatedAtMillis() - System.currentTimeMillis();
 			LinkedHashMap<TimeUnit, Long> ageUnitcounts = TimeDiffUtil.limit(TimeDiffUtil.unitcounts(ageMillis, TimeUnit.getAllButMillis()), 3);
 			String ageDesc = TimeDiffUtil.formatedVerboose(ageUnitcounts, "<i>");
-			show(idPriorityLiness, SHOW_ID_FACTION_AGE, SHOW_PRIORITY_FACTION_AGE, "Age", ageDesc);
+			show(idPriorityLiness, SHOW_ID_FACTION_AGE, SHOW_PRIORITY_FACTION_AGE, "Geçmiş", ageDesc);
 
 			// FLAGS
 			// We display all editable and non default ones. The rest we skip.
@@ -115,13 +115,13 @@ public class EngineShow extends Engine
 			{
 				flagsDesc = Txt.implode(flagDescs, Txt.parse(" <i>| "));
 			}
-			show(idPriorityLiness, SHOW_ID_FACTION_FLAGS, SHOW_PRIORITY_FACTION_FLAGS, "Flags", flagsDesc);
+			show(idPriorityLiness, SHOW_ID_FACTION_FLAGS, SHOW_PRIORITY_FACTION_FLAGS, "Gönderler", flagsDesc);
 
 			// POWER
 			double powerBoost = faction.getPowerBoost();
-			String boost = (powerBoost == 0.0) ? "" : (powerBoost > 0.0 ? " (bonus: " : " (penalty: ") + powerBoost + ")";
+			String boost = (powerBoost == 0.0) ? "" : (powerBoost > 0.0 ? " (bonus: " : " (negatif: ") + powerBoost + ")";
 			String powerDesc = Txt.parse("%d/%d/%d%s", faction.getLandCount(), faction.getPowerRounded(), faction.getPowerMaxRounded(), boost);
-			show(idPriorityLiness, SHOW_ID_FACTION_POWER, SHOW_PRIORITY_FACTION_POWER, "Land / Power / Maxpower", powerDesc);
+			show(idPriorityLiness, SHOW_ID_FACTION_POWER, SHOW_PRIORITY_FACTION_POWER, "Arazi / Güç / Maxgüç", powerDesc);
 
 			// SECTION: ECON
 			if (Econ.isEnabled())
@@ -143,7 +143,7 @@ public class EngineShow extends Engine
 						money *= -1;
 					}
 
-					String key = Txt.parse("Total Land %s %s", type.toString().toLowerCase(), word);
+					String key = Txt.parse("Toplam Arazi %s %s", type.toString().toLowerCase(), word);
 					String value = Txt.parse("<h>%s", Money.format(money));
 					String line = show(key, value);
 					landvalueLines.add(line);
@@ -155,7 +155,7 @@ public class EngineShow extends Engine
 				{
 					double bank = Money.get(faction);
 					String bankDesc = Txt.parse("<h>%s", Money.format(bank, true));
-					show(idPriorityLiness, SHOW_ID_FACTION_BANK, SHOW_PRIORITY_FACTION_BANK, "Bank", bankDesc);
+					show(idPriorityLiness, SHOW_ID_FACTION_BANK, SHOW_PRIORITY_FACTION_BANK, "Banka", bankDesc);
 				}
 			}
 		}
@@ -181,7 +181,7 @@ public class EngineShow extends Engine
 			}
 		}
 
-		String headerOnline = Txt.parse("<a>Followers Online (%s):", followerNamesOnline.size());
+		String headerOnline = Txt.parse("<a>Çevrimiçi yoldaşlar (%s):", followerNamesOnline.size());
 		followerLines.add(headerOnline);
 		if (followerNamesOnline.isEmpty())
 		{
@@ -194,7 +194,7 @@ public class EngineShow extends Engine
 
 		if (normal)
 		{
-			String headerOffline = Txt.parse("<a>Followers Offline (%s):", followerNamesOffline.size());
+			String headerOffline = Txt.parse("<a>Çevrimdışı yoldaşlar (%s):", followerNamesOffline.size());
 			followerLines.add(headerOffline);
 			if (followerNamesOffline.isEmpty())
 			{

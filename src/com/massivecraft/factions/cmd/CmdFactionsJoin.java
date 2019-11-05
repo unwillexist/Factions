@@ -14,88 +14,93 @@ import com.massivecraft.massivecore.MassiveException;
 import com.massivecraft.massivecore.mson.Mson;
 import com.massivecraft.massivecore.util.Txt;
 import org.bukkit.ChatColor;
+import com.massivecraft.massivecore.command.requirement.RequirementHasPerm;
 
 public class CmdFactionsJoin extends FactionsCommand
 {
 	// -------------------------------------------- //
 	// CONSTRUCT
 	// -------------------------------------------- //
-	
+
 	public CmdFactionsJoin()
 	{
 		// Parameters
-		this.addParameter(TypeFaction.get(), "faction");
-		this.addParameter(TypeMPlayer.get(), "player", "you");
+		this.addParameter(TypeFaction.get(), "klan");
+		this.addParameter(TypeMPlayer.get(), "oyuncu", "sen");
+
+		this.setSetupEnabled(false);
+		this.setAliases("katıl");
+
+		this.addRequirements(RequirementHasPerm.get(Perm.JOIN));
 	}
 
 	// -------------------------------------------- //
 	// OVERRIDE
 	// -------------------------------------------- //
-	
+
 	@Override
 	public void perform() throws MassiveException
 	{
 		// Args
-		Faction faction = this.readArg();		
+		Faction faction = this.readArg();
 
 		MPlayer mplayer = this.readArg(msender);
 		Faction mplayerFaction = mplayer.getFaction();
-		
+
 		boolean samePlayer = mplayer == msender;
-		
+
 		// Validate
 		if (!samePlayer  && ! Perm.JOIN_OTHERS.has(sender, false))
 		{
-			msg("<b>You do not have permission to move other players into a faction.");
+			msg("<b>Başka insanları klanlara taşımaya yetkin yok.");
 			return;
 		}
 
 		if (faction == mplayerFaction)
 		{
 			String command = CmdFactions.get().cmdFactionsKick.getCommandLine(mplayer.getName());
-			
+
 			// Mson creation
 			Mson alreadyMember = Mson.mson(
 				Mson.parse(mplayer.describeTo(msender, true)),
-				mson((samePlayer ? " are" : " is") + " already a member of " + faction.getName(msender) + ".").color(ChatColor.YELLOW)
+				mson((samePlayer ? "Sen" : "O") + faction.getName(msender) + " adlı klanın bir üyesi.").color(ChatColor.YELLOW)
 			);
-			
-			message(alreadyMember.suggest(command).tooltip(Txt.parse("<i>Click to <c>%s<i>.", command)));
+
+			message(alreadyMember.suggest(command).tooltip(Txt.parse("<i><c>%s için tıkla<i>.", command)));
 			return;
 		}
 
 		if (MConf.get().factionMemberLimit > 0 && faction.getMPlayers().size() >= MConf.get().factionMemberLimit)
 		{
-			msg(" <b>!<white> The faction %s is at the limit of %d members, so %s cannot currently join.", faction.getName(msender), MConf.get().factionMemberLimit, mplayer.describeTo(msender, false));
+			msg(" <b>!<white> %s adlı klan %d üyeye sahip bu maksimum üye sayısı olduğundan %s şuan klana giriş sağlayamaz.", faction.getName(msender), MConf.get().factionMemberLimit, mplayer.describeTo(msender, false));
 			return;
 		}
 
 		if (mplayerFaction.isNormal())
 		{
 			String command = CmdFactions.get().cmdFactionsLeave.getCommandLine(mplayer.getName());
-			
+
 			// Mson creation
 			Mson leaveFirst = Mson.mson(
 				Mson.parse(mplayer.describeTo(msender, true)),
-				mson(" must leave " + (samePlayer ? "your" : "their") + " current faction first.").color(ChatColor.RED)
+				mson((samePlayer ? "Senin" : "Onun") + " önce şuanki klanından " + (samePlayer ? "çıkman" : "çıkması") + " gerek.").color(ChatColor.RED)
 			);
-			
-			message(leaveFirst.suggest(command).tooltip(Txt.parse("<i>Click to <c>%s<i>.", command)));
+			message(leaveFirst.suggest(command).tooltip(Txt.parse("<i><c>%s<i> için tıkla.", command)));
 			return;
 		}
 
 		if (!MConf.get().canLeaveWithNegativePower && mplayer.getPower() < 0)
 		{
-			msg("<b>%s cannot join a faction with a negative power level.", mplayer.describeTo(msender, true));
+			msg("<b>%s adlı oyuncu negatif güç ile bir klana katılamaz.", mplayer.describeTo(msender, true));
 			return;
 		}
 
 		if( ! (faction.getFlag(MFlag.getFlagOpen()) || faction.isInvited(mplayer) || msender.isOverriding()))
 		{
-			msg("<i>This faction requires invitation.");
+			msg("<i>Bu klan davetiye gerektirir.");
 			if (samePlayer)
 			{
-				faction.msg("%s<i> tried to join your faction.", mplayer.describeTo(faction, true));
+				faction.msg("%s<i> klanına katılmaya çalıştı.", mplayer.describeTo(faction, true));
 			}
 			return;
 		}
@@ -104,19 +109,19 @@ public class CmdFactionsJoin extends FactionsCommand
 		EventFactionsMembershipChange membershipChangeEvent = new EventFactionsMembershipChange(sender, msender, faction, MembershipChangeReason.JOIN);
 		membershipChangeEvent.run();
 		if (membershipChangeEvent.isCancelled()) return;
-		
+
 		// Inform
 		if (!samePlayer)
 		{
-			mplayer.msg("<i>%s <i>moved you into the faction %s<i>.", msender.describeTo(mplayer, true), faction.getName(mplayer));
+			mplayer.msg("<i>%s <i>adlı oyuncu seni %s<i> klanına taşıdı.", msender.describeTo(mplayer, true), faction.getName(mplayer));
 		}
-		faction.msg("<i>%s <i>joined <lime>your faction<i>.", mplayer.describeTo(faction, true));
-		msender.msg("<i>%s <i>successfully joined %s<i>.", mplayer.describeTo(msender, true), faction.getName(msender));
-		
+		faction.msg("<i>%s <i>adlı oyuncu <lime>senin klanına<i> katıldı.", mplayer.describeTo(faction, true));
+		msender.msg("<i>%s <i>adlı oyuncu başarıyla %s<i> klanına katıldı.", mplayer.describeTo(msender, true), faction.getName(msender));
+
 		// Apply
 		mplayer.resetFactionData();
 		mplayer.setFaction(faction);
-		
+
 		faction.uninvite(mplayer);
 
 		// Derplog
@@ -124,13 +129,13 @@ public class CmdFactionsJoin extends FactionsCommand
 		{
 			if (samePlayer)
 			{
-				Factions.get().log(Txt.parse("%s joined the faction %s.", mplayer.getName(), faction.getName()));
+				Factions.get().log(Txt.parse("%s adlı oyuncu %s klanına katıldı.", mplayer.getName(), faction.getName()));
 			}
 			else
 			{
-				Factions.get().log(Txt.parse("%s moved the player %s into the faction %s.", msender.getName(), mplayer.getName(), faction.getName()));
+				Factions.get().log(Txt.parse("%s adlı oyuncu %s adlı oyuncuyu %s klanına taşıdı.", msender.getName(), mplayer.getName(), faction.getName()));
 			}
 		}
 	}
-	
+
 }

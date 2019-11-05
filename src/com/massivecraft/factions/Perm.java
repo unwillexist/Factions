@@ -9,7 +9,7 @@ public enum Perm implements Identified
 	// -------------------------------------------- //
 	// ENUM
 	// -------------------------------------------- //
-	
+
 	ACCESS,
 	ACCESS_VIEW,
 	ACCESS_PLAYER,
@@ -91,38 +91,38 @@ public enum Perm implements Identified
 	CONFIG,
 	CLEAN,
 	VERSION,
-	
+
 	// END OF LIST
 	;
-	
+
 	// -------------------------------------------- //
 	// FIELDS
 	// -------------------------------------------- //
-	
+
 	private final String id;
 	@Override public String getId() { return this.id; }
-	
+
 	// -------------------------------------------- //
 	// CONSTRUCT
 	// -------------------------------------------- //
-	
+
 	Perm()
 	{
 		this.id = PermissionUtil.createPermissionId(Factions.get(), this);
 	}
-	
+
 	// -------------------------------------------- //
 	// HAS
 	// -------------------------------------------- //
-	
+
 	public boolean has(Permissible permissible, boolean verboose)
 	{
 		return PermissionUtil.hasPermission(permissible, this, verboose);
 	}
-	
+
 	public boolean has(Permissible permissible)
 	{
 		return PermissionUtil.hasPermission(permissible, this);
 	}
-	
+
 }
